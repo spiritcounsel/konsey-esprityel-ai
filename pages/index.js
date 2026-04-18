@@ -1,36 +1,60 @@
 import { useState } from "react";
 
 export default function Home() {
+  const [userInput, setUserInput] = useState("");
   const [response, setResponse] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const sendMessage = async () => {
-    const res = await fetch("/api/voice", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ message: "hello" }),
-    });
-
-    const data = await res.json();
-    setResponse(data.reply);
+  const handleConsultation = async () => {
+    if (!userInput) return;
+    setIsLoading(true);
+    
+    // Logic for your API call goes here
+    setTimeout(() => {
+      setResponse("Chèche lapè nan silans la, epi wa jwenn repons w ap chèche a.");
+      setIsLoading(false);
+    }, 2000);
   };
 
   return (
     <main style={styles.page}>
       <div style={styles.card}>
-        <h1 style={styles.title}>Konsey Espirityèl AI</h1>
+        <h1 style={styles.title}>KONSEY ESPIRITYÈL</h1>
+        
         <p style={styles.subtitle}>
-          Yon espas prive pou jwenn konsèy, lapriyè, ak ankourajman.
+          Yon eksperyans prive, yon gid sajès nan pla men w.
         </p>
 
-        <button style={styles.button} onClick={sendMessage}>
-          Pale avè m
+        <div style={styles.inputContainer}>
+          <textarea
+            style={styles.textArea}
+            placeholder="Ki sa ki nan lespri w jodi a..."
+            value={userInput}
+            onChange={(e) => setUserInput(e.target.value)}
+          />
+        </div>
+
+        <button 
+          style={{
+            ...styles.button,
+            letterSpacing: "2px",
+            opacity: isLoading || !userInput ? 0.6 : 1
+          }} 
+          onClick={handleConsultation}
+          disabled={isLoading || !userInput}
+        >
+          {isLoading ? "AP CHÈCHE..." : "PALE AVÈ M"}
         </button>
 
-        <div style={styles.responseBox}>
-          {response || "Repons ou ap parèt isit la..."}
-        </div>
+        {response && (
+          <div style={styles.responseBox}>
+            <p style={styles.responseText}>{response}</p>
+          </div>
+        )}
+
+        <footer style={styles.footer}>
+          Lafwa • Lapè • Sajès
+        </footer>
       </div>
     </main>
   );
@@ -42,47 +66,76 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "#f4f7fb",
-    padding: "24px",
-    fontFamily: "Arial, sans-serif",
+    background: "linear-gradient(180deg, #fdfdfd 0%, #f4f7f9 100%)",
+    padding: "20px",
+    fontFamily: "'Times New Roman', serif", // Or a premium Google Font like 'Playfair Display'
   },
   card: {
     width: "100%",
-    maxWidth: "560px",
-    background: "#ffffff",
-    borderRadius: "20px",
-    padding: "36px 28px",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
+    maxWidth: "480px",
     textAlign: "center",
   },
   title: {
-    fontSize: "42px",
-    marginBottom: "10px",
-    color: "#0f172a",
+    fontSize: "24px",
+    letterSpacing: "4px",
+    color: "#1a1a1a",
+    fontWeight: "300",
+    marginBottom: "12px",
+    textTransform: "uppercase",
   },
   subtitle: {
-    fontSize: "18px",
-    color: "#475569",
-    marginBottom: "28px",
-    lineHeight: "1.5",
+    fontSize: "15px",
+    color: "#888",
+    fontStyle: "italic",
+    marginBottom: "40px",
+    fontWeight: "300",
+  },
+  inputContainer: {
+    marginBottom: "20px",
+  },
+  textArea: {
+    width: "100%",
+    background: "transparent",
+    border: "none",
+    borderBottom: "1px solid #ddd",
+    padding: "10px 0",
+    fontSize: "16px",
+    fontFamily: "serif",
+    resize: "none",
+    outline: "none",
+    textAlign: "center",
+    color: "#333",
+    transition: "border-color 0.4s ease",
   },
   button: {
-    background: "#1d4ed8",
-    color: "#ffffff",
+    background: "#1a1a1a", // Deep black/slate for luxury feel
+    color: "white",
     border: "none",
-    borderRadius: "14px",
-    padding: "16px 28px",
-    fontSize: "20px",
-    fontWeight: "bold",
+    borderRadius: "2px", // Sharp edges often feel more "premium" than rounded ones
+    padding: "16px 40px",
+    fontSize: "12px",
+    fontWeight: "400",
     cursor: "pointer",
-    marginBottom: "24px",
+    marginTop: "20px",
+    transition: "all 0.3s ease",
   },
   responseBox: {
-    minHeight: "70px",
-    background: "#f8fafc",
-    borderRadius: "14px",
-    padding: "18px",
-    color: "#0f172a",
-    fontSize: "18px",
+    marginTop: "40px",
+    padding: "20px",
+    borderTop: "1px solid #eee",
+    animation: "fadeIn 1s ease-in",
+  },
+  responseText: {
+    fontSize: "17px",
+    lineHeight: "1.8",
+    color: "#444",
+    fontStyle: "italic",
+  },
+  footer: {
+    marginTop: "60px",
+    fontSize: "11px",
+    letterSpacing: "2px",
+    color: "#b89b2e",
+    textTransform: "uppercase",
   },
 };
