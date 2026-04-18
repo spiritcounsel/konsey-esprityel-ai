@@ -7,6 +7,7 @@ export default function Home() {
   const [isHovered, setIsHovered] = useState(false);
   const textAreaRef = useRef(null);
 
+  // Auto-expand logic for the text box
   useEffect(() => {
     if (textAreaRef.current) {
       textAreaRef.current.style.height = "auto";
@@ -19,6 +20,7 @@ export default function Home() {
     if (!userInput) return;
     setIsLoading(true);
 
+    // Simulated response for the mockup
     setTimeout(() => {
       setResponse(
         "Nan moman ki pi lou yo, lapè pa toujou vini ak bri. Pafwa li vini dousman, tankou yon souf Bondye sou nanm ou. Pran tan ou. Limyè ap vini. ✨"
@@ -45,7 +47,7 @@ export default function Home() {
         }
 
         textarea::placeholder {
-          color: #b0aac2;
+          color: #8f8a9f;
         }
 
         @keyframes fadeUp {
@@ -64,6 +66,7 @@ export default function Home() {
         }
       `}</style>
 
+      {/* Decorative Auras */}
       <div style={styles.auraLeft} />
       <div style={styles.auraRight} />
       <div style={styles.auraCenter} />
@@ -77,8 +80,12 @@ export default function Home() {
         </h1>
 
         <p style={styles.subtitle}>
-          Yon espas prive kote entèlijans rankontre lafwa. <br />
-          Resevwa pawòl ki pote kalm ak direksyon.
+          Yon espas prive kote ou ka pale san pè, san jijman.
+        </p>
+
+        <p style={styles.explainer}>
+          Ekri sa ki sou kè w — ou pral resevwa yon repons ki pote
+          sajès, lapè, ak direksyon pou ede w jwenn limyè nan moman difisil yo.
         </p>
 
         <p style={styles.comfortLine}>Ou pa pou kont ou.</p>
@@ -142,7 +149,6 @@ const styles = {
     alignItems: "center",
     padding: "40px 20px",
   },
-
   auraLeft: {
     position: "absolute",
     top: "5%",
@@ -152,8 +158,8 @@ const styles = {
     background: "radial-gradient(circle, rgba(171,153,224,0.15), transparent 70%)",
     filter: "blur(60px)",
     animation: "floatAura 18s ease-in-out infinite",
+    pointerEvents: "none",
   },
-
   auraRight: {
     position: "absolute",
     bottom: "5%",
@@ -163,8 +169,8 @@ const styles = {
     background: "radial-gradient(circle, rgba(212,189,125,0.12), transparent 70%)",
     filter: "blur(60px)",
     animation: "floatAura 22s ease-in-out infinite reverse",
+    pointerEvents: "none",
   },
-
   auraCenter: {
     position: "absolute",
     top: "50%",
@@ -176,7 +182,6 @@ const styles = {
     background: "radial-gradient(circle, rgba(255,255,255,0.8), transparent 65%)",
     pointerEvents: "none",
   },
-
   content: {
     position: "relative",
     zIndex: 10,
@@ -185,7 +190,6 @@ const styles = {
     textAlign: "center",
     animation: "fadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1)",
   },
-
   badge: {
     display: "inline-block",
     padding: "8px 20px",
@@ -199,30 +203,35 @@ const styles = {
     marginBottom: "24px",
     boxShadow: "0 4px 15px rgba(0,0,0,0.02)",
   },
-
   title: {
     fontFamily: "'Cormorant Garamond', serif",
-    fontSize: "clamp(52px, 8.5vw, 86px)",
+    fontSize: "clamp(50px, 8vw, 82px)",
     lineHeight: "0.92",
     color: "#2D264B",
     marginBottom: "18px",
     fontWeight: "700",
   },
-
   titleAccent: {
     color: "#a99ae0",
     fontStyle: "italic",
     fontWeight: "600",
   },
-
   subtitle: {
-    fontSize: "18px",
-    color: "#6d6881",
-    lineHeight: "1.6",
-    marginBottom: "15px",
+    fontSize: "20px",
+    color: "#2D264B",
+    marginBottom: "10px",
+    fontWeight: "600",
+  },
+  explainer: {
+    fontSize: "16px",
+    color: "#5e5873",
+    lineHeight: "1.7",
+    marginBottom: "20px",
+    maxWidth: "560px",
+    marginLeft: "auto",
+    marginRight: "auto",
     fontWeight: "300",
   },
-
   comfortLine: {
     color: "#8f7f5e",
     fontSize: "16px",
@@ -230,7 +239,6 @@ const styles = {
     fontStyle: "italic",
     marginBottom: "35px",
   },
-
   card: {
     background: "rgba(255,255,255,0.82)",
     backdropFilter: "blur(20px)",
@@ -240,33 +248,29 @@ const styles = {
     boxShadow: "0 25px 50px rgba(61,49,103,0.08)",
     textAlign: "left",
   },
-
   labelRow: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: "14px",
-    gap: "12px",
     flexWrap: "wrap",
+    gap: "10px",
   },
-
   label: {
     fontSize: "15px",
     fontWeight: "600",
     color: "#564f73",
   },
-
   helperText: {
     fontSize: "12px",
     color: "#aaa4bc",
   },
-
   textArea: {
     width: "100%",
     minHeight: "80px",
     padding: "20px",
     borderRadius: "20px",
-    border: "1px solid #e7e1f4",
+    border: "1px solid #ddd5ef",
     background: "rgba(255,255,255,0.9)",
     fontSize: "18px",
     lineHeight: "1.6",
@@ -275,10 +279,9 @@ const styles = {
     resize: "none",
     color: "#353246",
     marginBottom: "24px",
-    transition: "border-color 0.3s ease",
+    transition: "border-color 0.3s ease, box-shadow 0.3s ease",
     overflow: "hidden",
   },
-
   button: {
     width: "100%",
     padding: "18px",
@@ -286,20 +289,17 @@ const styles = {
     border: "none",
     background: "linear-gradient(135deg, #b6acdf 0%, #9e92d6 100%)",
     color: "#fff",
-    fontSize: "15px",
+    fontSize: "16px",
     fontWeight: "700",
     letterSpacing: "1.8px",
     boxShadow: "0 10px 25px rgba(158,146,214,0.3)",
     transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
     marginBottom: "28px",
   },
-
   buttonHover: {
     transform: "translateY(-2px) scale(1.01)",
     boxShadow: "0 15px 30px rgba(158,146,214,0.4)",
-    filter: "brightness(1.05)",
   },
-
   responseBox: {
     background: "linear-gradient(to bottom, #ffffff, #f9f7ff)",
     borderRadius: "22px",
@@ -308,7 +308,6 @@ const styles = {
     borderLeft: "5px solid #d4bd7d",
     boxShadow: "0 10px 30px rgba(0,0,0,0.02)",
   },
-
   responseHeader: {
     fontSize: "12px",
     fontWeight: "700",
@@ -317,14 +316,12 @@ const styles = {
     textTransform: "uppercase",
     marginBottom: "10px",
   },
-
   responseText: {
     fontSize: "17.5px",
     lineHeight: "1.8",
     color: "#3f385e",
     margin: 0,
   },
-
   placeholderBox: {
     padding: "22px",
     textAlign: "center",
@@ -334,7 +331,6 @@ const styles = {
     border: "1px dashed #dcd6f0",
     borderRadius: "20px",
   },
-
   footer: {
     marginTop: "45px",
     fontSize: "12px",
