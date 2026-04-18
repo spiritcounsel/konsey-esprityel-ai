@@ -1,13 +1,22 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function Home() {
   const [userInput, setUserInput] = useState("");
   const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const textAreaRef = useRef(null);
+
+  useEffect(() => {
+    if (textAreaRef.current) {
+      textAreaRef.current.style.height = "auto";
+      textAreaRef.current.style.height =
+        textAreaRef.current.scrollHeight + "px";
+    }
+  }, [userInput]);
 
   const handleConsultation = async () => {
     if (!userInput) return;
-
     setIsLoading(true);
 
     setTimeout(() => {
@@ -21,17 +30,13 @@ export default function Home() {
   return (
     <div style={styles.container}>
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;600&display=swap');
 
-        html, body, #__next {
+        html, body {
           margin: 0;
           padding: 0;
-          min-height: 100%;
-        }
-
-        body {
+          background: #fcfaf6;
           font-family: 'Inter', sans-serif;
-          background: linear-gradient(180deg, #fcfaf6 0%, #f7f2fb 48%, #fdfbf8 100%);
           overflow-x: hidden;
         }
 
@@ -40,24 +45,22 @@ export default function Home() {
         }
 
         textarea::placeholder {
-          color: #9c98a8;
+          color: #b0aac2;
         }
 
         @keyframes fadeUp {
-          from {
-            opacity: 0;
-            transform: translateY(16px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes floatAura {
-          0% { transform: translate(0px, 0px) scale(1); }
-          50% { transform: translate(18px, -18px) scale(1.04); }
-          100% { transform: translate(0px, 0px) scale(1); }
+          0% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(15px, -20px) scale(1.03); }
+          100% { transform: translate(0, 0) scale(1); }
+        }
+
+        .response-enter {
+          animation: fadeUp 0.8s ease-out forwards;
         }
       `}</style>
 
@@ -66,7 +69,7 @@ export default function Home() {
       <div style={styles.auraCenter} />
 
       <main style={styles.content}>
-        <div style={styles.badge}>PRAN YON MOMAN • RESPIRE • LOUVRI KÈ W</div>
+        <div style={styles.badge}>SANKTYÈ • LAPÈ • SAJÈS</div>
 
         <h1 style={styles.title}>
           KONSEY <br />
@@ -74,19 +77,23 @@ export default function Home() {
         </h1>
 
         <p style={styles.subtitle}>
-          Yon espas prive kote entèlijans rankontre lafwa. Resevwa pawòl ki pote
-          kalm ak direksyon nan moman difisil yo.
+          Yon espas prive kote entèlijans rankontre lafwa. <br />
+          Resevwa pawòl ki pote kalm ak direksyon.
         </p>
+
+        <p style={styles.comfortLine}>Ou pa pou kont ou.</p>
 
         <div style={styles.card}>
           <div style={styles.labelRow}>
             <label style={styles.label}>Kisa k ap pase nan lespri w?</label>
-            <span style={styles.helperText}>Ekri lib, san jijman.</span>
+            <span style={styles.helperText}>Sa rete ant ou menm ak Bondye.</span>
           </div>
 
           <textarea
+            ref={textAreaRef}
             style={styles.textArea}
             placeholder="Mwen la pou m koute w..."
+            rows="3"
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
           />
@@ -94,18 +101,21 @@ export default function Home() {
           <button
             style={{
               ...styles.button,
+              ...(isHovered && userInput && !isLoading ? styles.buttonHover : {}),
               opacity: isLoading || !userInput ? 0.7 : 1,
               cursor: isLoading || !userInput ? "not-allowed" : "pointer",
             }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
             onClick={handleConsultation}
             disabled={isLoading || !userInput}
           >
-            {isLoading ? "MAP KOUTE..." : "CHÈCHE LAPÈ"}
+            {isLoading ? "M AP KOUTE..." : "CHÈCHE LAPÈ"}
           </button>
 
-          <div style={styles.responseWrap}>
+          <div>
             {response ? (
-              <div style={styles.responseBox}>
+              <div className="response-enter" style={styles.responseBox}>
                 <div style={styles.responseHeader}>Yon pawòl pou ou</div>
                 <p style={styles.responseText}>{response}</p>
               </div>
@@ -126,85 +136,77 @@ export default function Home() {
 const styles = {
   container: {
     minHeight: "100vh",
-    width: "100%",
     position: "relative",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    padding: "36px 18px",
-    overflow: "hidden",
+    padding: "40px 20px",
   },
 
   auraLeft: {
     position: "absolute",
-    top: "6%",
-    left: "-8%",
-    width: "420px",
-    height: "420px",
-    background:
-      "radial-gradient(circle, rgba(171,153,224,0.18) 0%, rgba(171,153,224,0.08) 34%, rgba(255,255,255,0) 72%)",
-    filter: "blur(42px)",
-    animation: "floatAura 16s ease-in-out infinite",
-    pointerEvents: "none",
+    top: "5%",
+    left: "-10%",
+    width: "450px",
+    height: "450px",
+    background: "radial-gradient(circle, rgba(171,153,224,0.15), transparent 70%)",
+    filter: "blur(60px)",
+    animation: "floatAura 18s ease-in-out infinite",
   },
 
   auraRight: {
     position: "absolute",
-    bottom: "4%",
-    right: "-8%",
-    width: "400px",
-    height: "400px",
-    background:
-      "radial-gradient(circle, rgba(212,189,125,0.14) 0%, rgba(212,189,125,0.06) 32%, rgba(255,255,255,0) 72%)",
-    filter: "blur(42px)",
-    animation: "floatAura 20s ease-in-out infinite reverse",
-    pointerEvents: "none",
+    bottom: "5%",
+    right: "-10%",
+    width: "450px",
+    height: "450px",
+    background: "radial-gradient(circle, rgba(212,189,125,0.12), transparent 70%)",
+    filter: "blur(60px)",
+    animation: "floatAura 22s ease-in-out infinite reverse",
   },
 
   auraCenter: {
     position: "absolute",
-    top: "34%",
+    top: "50%",
     left: "50%",
-    transform: "translateX(-50%)",
-    width: "360px",
-    height: "360px",
-    background:
-      "radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.28) 35%, rgba(255,255,255,0) 70%)",
-    filter: "blur(30px)",
+    transform: "translate(-50%, -50%)",
+    width: "100%",
+    maxWidth: "800px",
+    height: "600px",
+    background: "radial-gradient(circle, rgba(255,255,255,0.8), transparent 65%)",
     pointerEvents: "none",
   },
 
   content: {
     position: "relative",
-    zIndex: 2,
+    zIndex: 10,
+    maxWidth: "660px",
     width: "100%",
-    maxWidth: "760px",
     textAlign: "center",
-    animation: "fadeUp 0.9s ease-out forwards",
+    animation: "fadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1)",
   },
 
   badge: {
     display: "inline-block",
-    padding: "9px 16px",
-    borderRadius: "999px",
-    background: "rgba(255,255,255,0.72)",
+    padding: "8px 20px",
+    borderRadius: "100px",
+    background: "#fff",
     border: "1px solid rgba(197,172,101,0.22)",
     color: "#aa8b3f",
     fontSize: "11px",
-    letterSpacing: "2.1px",
-    fontWeight: "600",
-    marginBottom: "22px",
-    boxShadow: "0 8px 22px rgba(0,0,0,0.035)",
+    fontWeight: "700",
+    letterSpacing: "2.5px",
+    marginBottom: "24px",
+    boxShadow: "0 4px 15px rgba(0,0,0,0.02)",
   },
 
   title: {
-    margin: "0",
     fontFamily: "'Cormorant Garamond', serif",
-    fontSize: "clamp(52px, 8vw, 88px)",
-    lineHeight: 0.92,
+    fontSize: "clamp(52px, 8.5vw, 86px)",
+    lineHeight: "0.92",
+    color: "#2D264B",
+    marginBottom: "18px",
     fontWeight: "700",
-    letterSpacing: "-1px",
-    color: "#38315b",
   },
 
   titleAccent: {
@@ -214,133 +216,131 @@ const styles = {
   },
 
   subtitle: {
-    maxWidth: "650px",
-    margin: "22px auto 34px auto",
-    color: "#6d6881",
     fontSize: "18px",
-    lineHeight: "1.8",
-    fontWeight: "400",
+    color: "#6d6881",
+    lineHeight: "1.6",
+    marginBottom: "15px",
+    fontWeight: "300",
+  },
+
+  comfortLine: {
+    color: "#8f7f5e",
+    fontSize: "16px",
+    fontWeight: "600",
+    fontStyle: "italic",
+    marginBottom: "35px",
   },
 
   card: {
-    width: "100%",
-    maxWidth: "650px",
-    margin: "0 auto",
-    background: "rgba(255,255,255,0.78)",
-    backdropFilter: "blur(14px)",
-    WebkitBackdropFilter: "blur(14px)",
-    border: "1px solid rgba(221,214,241,0.9)",
-    borderRadius: "28px",
-    padding: "28px",
+    background: "rgba(255,255,255,0.82)",
+    backdropFilter: "blur(20px)",
+    borderRadius: "32px",
+    padding: "32px",
+    border: "1px solid rgba(133,120,195,0.15)",
+    boxShadow: "0 25px 50px rgba(61,49,103,0.08)",
     textAlign: "left",
-    boxShadow:
-      "0 20px 45px rgba(108,93,160,0.08), 0 8px 18px rgba(0,0,0,0.03)",
   },
 
   labelRow: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: "12px",
+    marginBottom: "14px",
     gap: "12px",
     flexWrap: "wrap",
   },
 
   label: {
-    color: "#5a5473",
     fontSize: "15px",
     fontWeight: "600",
+    color: "#564f73",
   },
 
   helperText: {
-    color: "#aaa4bc",
     fontSize: "12px",
-    fontWeight: "500",
+    color: "#aaa4bc",
   },
 
   textArea: {
     width: "100%",
-    minHeight: "150px",
-    resize: "none",
-    borderRadius: "18px",
+    minHeight: "80px",
+    padding: "20px",
+    borderRadius: "20px",
     border: "1px solid #e7e1f4",
-    background: "rgba(255,255,255,0.92)",
-    padding: "18px",
+    background: "rgba(255,255,255,0.9)",
+    fontSize: "18px",
+    lineHeight: "1.6",
+    fontFamily: "inherit",
     outline: "none",
-    fontSize: "17px",
-    lineHeight: "1.7",
-    color: "#47425d",
-    fontFamily: "'Inter', sans-serif",
-    boxShadow: "inset 0 1px 4px rgba(0,0,0,0.02)",
-    marginBottom: "18px",
+    resize: "none",
+    color: "#353246",
+    marginBottom: "24px",
+    transition: "border-color 0.3s ease",
+    overflow: "hidden",
   },
 
   button: {
     width: "100%",
+    padding: "18px",
+    borderRadius: "100px",
     border: "none",
-    borderRadius: "999px",
-    padding: "16px 22px",
     background: "linear-gradient(135deg, #b6acdf 0%, #9e92d6 100%)",
-    color: "#ffffff",
-    fontSize: "14px",
+    color: "#fff",
+    fontSize: "15px",
     fontWeight: "700",
-    letterSpacing: "1.6px",
-    boxShadow: "0 10px 24px rgba(158,146,214,0.24)",
-    marginBottom: "20px",
-    transition: "all 0.3s ease",
+    letterSpacing: "1.8px",
+    boxShadow: "0 10px 25px rgba(158,146,214,0.3)",
+    transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+    marginBottom: "28px",
   },
 
-  responseWrap: {
-    marginTop: "2px",
+  buttonHover: {
+    transform: "translateY(-2px) scale(1.01)",
+    boxShadow: "0 15px 30px rgba(158,146,214,0.4)",
+    filter: "brightness(1.05)",
   },
 
   responseBox: {
-    background: "linear-gradient(180deg, #fffdfd 0%, #faf7ff 100%)",
-    border: "1px solid #eee7fb",
-    borderLeft: "4px solid #d4bd7d",
-    borderRadius: "18px",
-    padding: "18px",
-    animation: "fadeUp 0.7s ease-out",
+    background: "linear-gradient(to bottom, #ffffff, #f9f7ff)",
+    borderRadius: "22px",
+    padding: "26px",
+    border: "1px solid #eee9f8",
+    borderLeft: "5px solid #d4bd7d",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.02)",
   },
 
   responseHeader: {
     fontSize: "12px",
     fontWeight: "700",
-    letterSpacing: "1.4px",
     color: "#b08f43",
+    letterSpacing: "1.5px",
     textTransform: "uppercase",
     marginBottom: "10px",
   },
 
   responseText: {
-    margin: 0,
-    color: "#4a4561",
-    fontSize: "17px",
+    fontSize: "17.5px",
     lineHeight: "1.8",
+    color: "#3f385e",
+    margin: 0,
   },
 
   placeholderBox: {
-    minHeight: "84px",
-    borderRadius: "18px",
-    border: "1px dashed #e5ddf5",
-    background: "rgba(252,249,255,0.82)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    padding: "22px",
     textAlign: "center",
-    color: "#9a94aa",
+    color: "#b0aac2",
     fontSize: "15px",
-    lineHeight: "1.7",
-    padding: "18px",
     fontStyle: "italic",
+    border: "1px dashed #dcd6f0",
+    borderRadius: "20px",
   },
 
   footer: {
-    marginTop: "28px",
-    textAlign: "center",
-    color: "#af9c67",
-    letterSpacing: "5px",
+    marginTop: "45px",
     fontSize: "12px",
+    letterSpacing: "6px",
+    color: "#9b9169",
     fontWeight: "600",
+    opacity: 0.8,
   },
 };
