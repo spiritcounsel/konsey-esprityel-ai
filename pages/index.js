@@ -1,29 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function Home() {
   const [userInput, setUserInput] = useState("");
   const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Keyboard Shortcut: Cmd/Ctrl + Enter to send
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-        handleConsultation();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [userInput]);
-
   const handleConsultation = async () => {
-    if (!userInput || isLoading) return;
+    if (!userInput) return;
+
     setIsLoading(true);
-    
-    // Simulating the spiritual AI logic
+
     setTimeout(() => {
       setResponse(
-        "Nan mitan boulvès, gen yon kote andedan ou kote Bondye toujou mete lapè. Rete trankil, respire, epi kite limyè a gide kè ou. ✨"
+        "Nan moman ki pi lou yo, lapè pa toujou vini ak bri. Pafwa li vini dousman, tankou yon souf Bondye sou nanm ou. Pran tan ou. Limyè ap vini. ✨"
       );
       setIsLoading(false);
     }, 2200);
@@ -32,68 +21,67 @@ export default function Home() {
   return (
     <div style={styles.container}>
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@300;400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
-        html, body {
+        html, body, #__next {
           margin: 0;
           padding: 0;
-          background: #faf9f6;
+          min-height: 100%;
+        }
+
+        body {
           font-family: 'Inter', sans-serif;
+          background: linear-gradient(180deg, #fcfaf6 0%, #f7f2fb 48%, #fdfbf8 100%);
           overflow-x: hidden;
         }
 
-        /* The 100/10 Premium Button Animation */
-        .premium-button {
-          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-        }
-        .premium-button:hover:not(:disabled) {
-          transform: translateY(-3px) scale(1.01);
-          box-shadow: 0 15px 30px rgba(107, 95, 167, 0.3) !important;
-          filter: brightness(1.1);
-        }
-        .premium-button:active:not(:disabled) {
-          transform: translateY(0) scale(0.98);
+        * {
+          box-sizing: border-box;
         }
 
-        /* Subtle Pattern for Haitian Identity */
-        .haitian-pattern {
-          opacity: 0.03;
-          background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%233f385e' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        textarea::placeholder {
+          color: #9c98a8;
         }
 
-        @keyframes fadeInScale {
-          from { opacity: 0; transform: scale(0.98) translateY(10px); }
-          to { opacity: 1; transform: scale(1) translateY(0); }
+        @keyframes fadeUp {
+          from {
+            opacity: 0;
+            transform: translateY(16px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes floatAura {
+          0% { transform: translate(0px, 0px) scale(1); }
+          50% { transform: translate(18px, -18px) scale(1.04); }
+          100% { transform: translate(0px, 0px) scale(1); }
         }
       `}</style>
 
-      {/* Decorative Elements */}
-      <div className="haitian-pattern" style={styles.patternOverlay} />
-      <div style={styles.auraTopLeft} />
-      <div style={styles.auraBottomRight} />
+      <div style={styles.auraLeft} />
+      <div style={styles.auraRight} />
       <div style={styles.auraCenter} />
 
       <main style={styles.content}>
-        <header style={styles.header}>
-          <div style={styles.badge}>
-            <span style={styles.badgeDot}></span>
-            SANKTYÈ ESPIRITYÈL • POU AYITI
-          </div>
+        <div style={styles.badge}>PRAN YON MOMAN • RESPIRE • LOUVRI KÈ W</div>
 
-          <h1 style={styles.title}>
-            KONSEY <span style={styles.titleAccent}>ESPIRITYÈL</span>
-          </h1>
+        <h1 style={styles.title}>
+          KONSEY <br />
+          <span style={styles.titleAccent}>ESPIRITYÈL</span>
+        </h1>
 
-          <p style={styles.subtitle}>
-            Yon espas prive kote entèlijans rankontre lafwa. 
-            Resevwa pawòl ki pote kalm ak direksyon nan moman difisil yo.
-          </p>
-        </header>
+        <p style={styles.subtitle}>
+          Yon espas prive kote entèlijans rankontre lafwa. Resevwa pawòl ki pote
+          kalm ak direksyon nan moman difisil yo.
+        </p>
 
         <div style={styles.card}>
-          <div style={styles.inputHeader}>
-            <span style={styles.label}>Kisa k ap pase nan lespri w?</span>
-            <span style={styles.shortcutHint}>Press ⌘ + Enter</span>
+          <div style={styles.labelRow}>
+            <label style={styles.label}>Kisa k ap pase nan lespri w?</label>
+            <span style={styles.helperText}>Ekri lib, san jijman.</span>
           </div>
 
           <textarea
@@ -104,10 +92,9 @@ export default function Home() {
           />
 
           <button
-            className="premium-button"
             style={{
               ...styles.button,
-              opacity: isLoading || !userInput ? 0.6 : 1,
+              opacity: isLoading || !userInput ? 0.7 : 1,
               cursor: isLoading || !userInput ? "not-allowed" : "pointer",
             }}
             onClick={handleConsultation}
@@ -116,26 +103,21 @@ export default function Home() {
             {isLoading ? "MAP KOUTE..." : "CHÈCHE LAPÈ"}
           </button>
 
-          <div style={styles.responseArea}>
+          <div style={styles.responseWrap}>
             {response ? (
               <div style={styles.responseBox}>
-                <div style={styles.responseLabel}>
-                  <span style={styles.sparkle}>✦</span> REPONS POU OU
-                </div>
+                <div style={styles.responseHeader}>Yon pawòl pou ou</div>
                 <p style={styles.responseText}>{response}</p>
               </div>
             ) : (
-              <div style={styles.emptyState}>
-                <p>Repons ou ap parèt isit la avèk dousè ak sajès.</p>
+              <div style={styles.placeholderBox}>
+                Repons ou ap parèt isit la avèk dousè ak sajès.
               </div>
             )}
           </div>
         </div>
 
-        <footer style={styles.footer}>
-          <div style={styles.footerLine} />
-          <p style={styles.footerText}>LAFWA • LAPÈ • SAJÈS</p>
-        </footer>
+        <footer style={styles.footer}>LAFWA • LAPÈ • SAJÈS</footer>
       </main>
     </div>
   );
@@ -147,200 +129,218 @@ const styles = {
     width: "100%",
     position: "relative",
     display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
     justifyContent: "center",
-    padding: "40px 20px",
+    alignItems: "center",
+    padding: "36px 18px",
+    overflow: "hidden",
   },
-  patternOverlay: {
+
+  auraLeft: {
     position: "absolute",
-    inset: 0,
-    zIndex: 0,
+    top: "6%",
+    left: "-8%",
+    width: "420px",
+    height: "420px",
+    background:
+      "radial-gradient(circle, rgba(171,153,224,0.18) 0%, rgba(171,153,224,0.08) 34%, rgba(255,255,255,0) 72%)",
+    filter: "blur(42px)",
+    animation: "floatAura 16s ease-in-out infinite",
     pointerEvents: "none",
   },
-  auraTopLeft: {
+
+  auraRight: {
     position: "absolute",
-    top: "-5%",
-    left: "-5%",
-    width: "600px",
-    height: "600px",
-    background: "radial-gradient(circle, rgba(138,127,207,0.15) 0%, transparent 70%)",
-    filter: "blur(40px)",
-    zIndex: 1,
+    bottom: "4%",
+    right: "-8%",
+    width: "400px",
+    height: "400px",
+    background:
+      "radial-gradient(circle, rgba(212,189,125,0.14) 0%, rgba(212,189,125,0.06) 32%, rgba(255,255,255,0) 72%)",
+    filter: "blur(42px)",
+    animation: "floatAura 20s ease-in-out infinite reverse",
+    pointerEvents: "none",
   },
-  auraBottomRight: {
-    position: "absolute",
-    bottom: "-5%",
-    right: "-5%",
-    width: "600px",
-    height: "600px",
-    background: "radial-gradient(circle, rgba(198,168,94,0.12) 0%, transparent 70%)",
-    filter: "blur(40px)",
-    zIndex: 1,
-  },
+
   auraCenter: {
     position: "absolute",
-    top: "50%",
+    top: "34%",
     left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "100%",
-    maxWidth: "800px",
-    height: "600px",
-    background: "radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 60%)",
-    zIndex: 1,
+    transform: "translateX(-50%)",
+    width: "360px",
+    height: "360px",
+    background:
+      "radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.28) 35%, rgba(255,255,255,0) 70%)",
+    filter: "blur(30px)",
     pointerEvents: "none",
   },
+
   content: {
     position: "relative",
-    zIndex: 10,
+    zIndex: 2,
     width: "100%",
-    maxWidth: "720px",
-    animation: "fadeInScale 1.2s cubic-bezier(0.16, 1, 0.3, 1)",
+    maxWidth: "760px",
+    textAlign: "center",
+    animation: "fadeUp 0.9s ease-out forwards",
   },
+
   badge: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "8px",
-    padding: "8px 16px",
-    borderRadius: "100px",
-    background: "white",
-    border: "1px solid rgba(198,168,94,0.3)",
-    color: "#8b6f2d",
+    display: "inline-block",
+    padding: "9px 16px",
+    borderRadius: "999px",
+    background: "rgba(255,255,255,0.72)",
+    border: "1px solid rgba(197,172,101,0.22)",
+    color: "#aa8b3f",
     fontSize: "11px",
+    letterSpacing: "2.1px",
     fontWeight: "600",
-    letterSpacing: "2px",
-    marginBottom: "24px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
+    marginBottom: "22px",
+    boxShadow: "0 8px 22px rgba(0,0,0,0.035)",
   },
-  badgeDot: {
-    width: "6px",
-    height: "6px",
-    background: "#c6a85e",
-    borderRadius: "50%",
-  },
+
   title: {
-    fontFamily: "'Playfair Display', serif",
-    fontSize: "clamp(48px, 8vw, 84px)",
-    color: "#2D264B",
-    margin: "0 0 20px 0",
+    margin: "0",
+    fontFamily: "'Cormorant Garamond', serif",
+    fontSize: "clamp(52px, 8vw, 88px)",
+    lineHeight: 0.92,
     fontWeight: "700",
-    lineHeight: 0.95,
-    letterSpacing: "-2px",
+    letterSpacing: "-1px",
+    color: "#38315b",
   },
+
   titleAccent: {
-    color: "#7c70b8",
+    color: "#a99ae0",
     fontStyle: "italic",
-    fontWeight: "500",
+    fontWeight: "600",
   },
+
   subtitle: {
-    fontSize: "19px",
-    color: "#666277",
-    lineHeight: 1.6,
-    marginBottom: "48px",
-    fontWeight: "300",
+    maxWidth: "650px",
+    margin: "22px auto 34px auto",
+    color: "#6d6881",
+    fontSize: "18px",
+    lineHeight: "1.8",
+    fontWeight: "400",
   },
+
   card: {
-    background: "rgba(255, 255, 255, 0.8)",
-    backdropFilter: "blur(20px)",
-    borderRadius: "32px",
-    padding: "32px",
-    border: "1px solid rgba(133,120,195,0.15)",
-    boxShadow: "0 30px 60px rgba(61,49,103,0.1)",
+    width: "100%",
+    maxWidth: "650px",
+    margin: "0 auto",
+    background: "rgba(255,255,255,0.78)",
+    backdropFilter: "blur(14px)",
+    WebkitBackdropFilter: "blur(14px)",
+    border: "1px solid rgba(221,214,241,0.9)",
+    borderRadius: "28px",
+    padding: "28px",
+    textAlign: "left",
+    boxShadow:
+      "0 20px 45px rgba(108,93,160,0.08), 0 8px 18px rgba(0,0,0,0.03)",
   },
-  inputHeader: {
+
+  labelRow: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: "12px",
+    gap: "12px",
+    flexWrap: "wrap",
   },
+
   label: {
-    fontSize: "14px",
+    color: "#5a5473",
+    fontSize: "15px",
     fontWeight: "600",
-    color: "#564f73",
   },
-  shortcutHint: {
-    fontSize: "11px",
-    color: "#aaa",
-    fontWeight: "400",
+
+  helperText: {
+    color: "#aaa4bc",
+    fontSize: "12px",
+    fontWeight: "500",
   },
+
   textArea: {
     width: "100%",
-    minHeight: "160px",
-    padding: "20px",
-    borderRadius: "20px",
-    border: "1px solid #e6e0f4",
-    background: "white",
-    fontSize: "18px",
-    fontFamily: "inherit",
-    outline: "none",
+    minHeight: "150px",
     resize: "none",
-    color: "#353246",
-    transition: "border-color 0.3s ease",
-    marginBottom: "24px",
+    borderRadius: "18px",
+    border: "1px solid #e7e1f4",
+    background: "rgba(255,255,255,0.92)",
+    padding: "18px",
+    outline: "none",
+    fontSize: "17px",
+    lineHeight: "1.7",
+    color: "#47425d",
+    fontFamily: "'Inter', sans-serif",
+    boxShadow: "inset 0 1px 4px rgba(0,0,0,0.02)",
+    marginBottom: "18px",
   },
+
   button: {
     width: "100%",
-    padding: "18px",
-    borderRadius: "100px",
     border: "none",
-    background: "linear-gradient(135deg, #8a7fcf 0%, #6b5fa7 100%)",
-    color: "white",
-    fontSize: "15px",
+    borderRadius: "999px",
+    padding: "16px 22px",
+    background: "linear-gradient(135deg, #b6acdf 0%, #9e92d6 100%)",
+    color: "#ffffff",
+    fontSize: "14px",
     fontWeight: "700",
-    letterSpacing: "2px",
-    boxShadow: "0 10px 25px rgba(107, 95, 167, 0.2)",
+    letterSpacing: "1.6px",
+    boxShadow: "0 10px 24px rgba(158,146,214,0.24)",
+    marginBottom: "20px",
+    transition: "all 0.3s ease",
   },
-  responseArea: {
-    marginTop: "24px",
+
+  responseWrap: {
+    marginTop: "2px",
   },
+
   responseBox: {
-    background: "linear-gradient(to bottom, #fdfdff, #f7f3ff)",
-    borderRadius: "20px",
-    padding: "24px",
-    border: "1px solid #eee9f8",
-    borderLeft: "5px solid #c6a85e",
-    animation: "fadeInScale 0.6s ease-out",
+    background: "linear-gradient(180deg, #fffdfd 0%, #faf7ff 100%)",
+    border: "1px solid #eee7fb",
+    borderLeft: "4px solid #d4bd7d",
+    borderRadius: "18px",
+    padding: "18px",
+    animation: "fadeUp 0.7s ease-out",
   },
-  responseLabel: {
+
+  responseHeader: {
     fontSize: "12px",
     fontWeight: "700",
-    color: "#c6a85e",
-    letterSpacing: "1.5px",
-    marginBottom: "8px",
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
+    letterSpacing: "1.4px",
+    color: "#b08f43",
+    textTransform: "uppercase",
+    marginBottom: "10px",
   },
+
   responseText: {
+    margin: 0,
+    color: "#4a4561",
     fontSize: "17px",
     lineHeight: "1.8",
-    color: "#3f385e",
-    margin: 0,
   },
-  emptyState: {
-    padding: "20px",
-    textAlign: "center",
-    color: "#b0aac2",
-    fontSize: "15px",
-    fontStyle: "italic",
-    border: "1px dashed #dcd6f0",
+
+  placeholderBox: {
+    minHeight: "84px",
     borderRadius: "18px",
-  },
-  footer: {
-    marginTop: "50px",
+    border: "1px dashed #e5ddf5",
+    background: "rgba(252,249,255,0.82)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
     textAlign: "center",
+    color: "#9a94aa",
+    fontSize: "15px",
+    lineHeight: "1.7",
+    padding: "18px",
+    fontStyle: "italic",
   },
-  footerLine: {
-    width: "40px",
-    height: "2px",
-    background: "#c6a85e",
-    margin: "0 auto 16px auto",
-    opacity: 0.4,
-  },
-  footerText: {
-    fontSize: "12px",
+
+  footer: {
+    marginTop: "28px",
+    textAlign: "center",
+    color: "#af9c67",
     letterSpacing: "5px",
-    color: "#9b9169",
+    fontSize: "12px",
     fontWeight: "600",
-  }
+  },
 };
