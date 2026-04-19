@@ -1,6 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// We add 'v1' here to stop the 404 error from the logs
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export default async function handler(req, res) {
@@ -9,10 +8,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    // We specify the model AND use the most stable generation method
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash" 
-    }, { apiVersion: 'v1' }); 
+    // We are using 'gemini-1.5-flash-latest' which is the 
+    // global stable name that avoids the 404 error.
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     const userPrompt = body.message || "Bonjou";
@@ -27,8 +25,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ text: text });
 
   } catch (error) {
-    console.error("LOGS:", error);
-    // This will now show the exact error message on your website screen
+    console.error("DEBUG:", error);
     return res.status(500).json({ 
       text: "Sanktyè gen yon ti pwoblèm. Erè: " + error.message 
     });
