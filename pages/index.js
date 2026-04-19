@@ -19,14 +19,26 @@ export default function Home() {
   const handleConsultation = async () => {
     if (!userInput) return;
     setIsLoading(true);
+    setResponse(""); 
 
-    // Simulated response for the mockup
-    setTimeout(() => {
-      setResponse(
-        "Nan moman ki pi lou yo, lapè pa toujou vini ak bri. Pafwa li vini dousman, tankou yon souf Bondye sou nanm ou. Pran tan ou. Limyè ap vini. ✨"
-      );
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userInput }),
+      });
+
+      const data = await res.json();
+      if (data.text) {
+        setResponse(data.text);
+      } else {
+        setResponse("Eskize m, mwen pa ka reponn kounye a. Eseye ankò.");
+      }
+    } catch (error) {
+      setResponse("Gen yon ti pwoblèm teknik. Lapriyè pou nou!");
+    } finally {
       setIsLoading(false);
-    }, 2200);
+    }
   };
 
   return (
