@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+// We add 'v1' here to stop the 404 error from the logs
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export default async function handler(req, res) {
@@ -8,31 +9,28 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Check if the API key exists
-    if (!process.env.GEMINI_API_KEY) {
-      throw new Error("API Key is missing in DigitalOcean settings");
-    }
-
+    // We specify the model AND use the most stable generation method
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-pro",
-      systemInstruction: "Ou se Sanktyè, yon gid espirityèl Katolik k ap pale Kreyòl Ayisyen. Bay moun konsèy ak lapriyè.",
-    });
+      model: "gemini-1.5-flash" 
+    }, { apiVersion: 'v1' }); 
 
-    // Extract message clearly
-    const userPrompt = req.body.message || "Bonjou";
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const userPrompt = body.message || "Bonjou";
 
-    const chat = model.startChat({ history: [] });
-    const result = await chat.sendMessage(userPrompt);
+    const result = await model.generateContent(
+      `Ou se Sanktyè, yon gid espirityèl Katolik Ayisyen. Reponn ak anpil sajès nan lang Kreyòl sèlman: ${userPrompt}`
+    );
+    
     const response = await result.response;
     const text = response.text();
     
     return res.status(200).json({ text: text });
 
   } catch (error) {
-    console.error("Gemini Error:", error);
-    // This tells the website exactly what went wrong
+    console.error("LOGS:", error);
+    // This will now show the exact error message on your website screen
     return res.status(500).json({ 
-      text: "Sanktyè gen yon ti pwoblèm koneksyon kounye a. Tanpri eseye ankò." 
+      text: "Sanktyè gen yon ti pwoblèm. Erè: " + error.message 
     });
   }
 }
