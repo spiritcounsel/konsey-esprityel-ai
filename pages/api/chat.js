@@ -3,8 +3,9 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export default async function handler(req, res) {
+  // Only allow POST requests (what your website sends)
   if (req.method !== "POST") {
-    return res.status(405).json({ message: "Metòd pa otorize" });
+    return res.status(405).json({ text: "Metòd pa otorize" });
   }
 
   const model = genAI.getGenerativeModel({ 
@@ -12,23 +13,22 @@ export default async function handler(req, res) {
     systemInstruction: `
       Ou se 'Sanktyè', yon gid espirityèl Katolik pou kominote Ayisyen an. 
       Ton ou dwe dou, plen lanmou, ak sajès. 
-      
-      MISYON OU:
-      1. Sèvi ak lapriyè Katolik (Notre Père, Je vous salue Marie, elatriye) pou ankouraje moun.
-      2. Sèvi ak kantik Katolik Ayisyen pou bay moun fòs.
-      3. Toujou pale an Kreyòl Ayisyen.
-      4. Si yon moun di li gen gwo kriz oswa li vle fè tèt li mal, di li wè yon pè oswa yon doktè imedyatman.
+      Toujou pale an Kreyòl Ayisyen.
+      Sèvi ak lapriyè oswa kantik pou ankouraje moun.
     `,
   });
 
   try {
     const chat = model.startChat({ history: [] });
-    const result = await chat.sendMessage(req.body.message);
+    const result = await chat.sendMessage(req.body.message || "Bonjou");
     const response = await result.response;
+    const text = response.text();
     
-    res.status(200).json({ text: response.text() });
+    // This sends back 'text', which your website is looking for
+    res.status(200).json({ text: text });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Pwoblèm koneksyon ak syèl la." });
+    // If something breaks, this shows up in the gold box
+    res.status(500).json({ text: "Sanktyè gen yon ti pwoblèm koneksyon kounye a. Tanpri eseye ankò." });
   }
 }
