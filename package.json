@@ -2,9 +2,7 @@
   "name": "konsey-esprityel-ai",
   "version": "0.1.0",
   "private": true,
-  "engines": {
-  "node": "22.x"
-},"scripts": {
+  "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -15,5 +13,5 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "@google/generative-ai": "^0.11.0"
-  },
+  }
 }
