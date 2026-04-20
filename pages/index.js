@@ -2,42 +2,52 @@ import { useState, useRef, useEffect } from "react";
 
 export default function Home() {
   const [userInput, setUserInput] = useState("");
-  const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [history, setHistory] = useState([]);
   const textAreaRef = useRef(null);
+  const bottomRef = useRef(null);
 
-  // Auto-expand logic for the text box
   useEffect(() => {
     if (textAreaRef.current) {
       textAreaRef.current.style.height = "auto";
-      textAreaRef.current.style.height =
-        textAreaRef.current.scrollHeight + "px";
+      textAreaRef.current.style.height = textAreaRef.current.scrollHeight + "px";
     }
   }, [userInput]);
 
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [history]);
+
   const handleConsultation = async () => {
-    if (!userInput) return;
+    if (!userInput.trim()) return;
     setIsLoading(true);
-    setResponse(""); 
+
+    const newHistory = [...history, { role: "user", content: userInput }];
+    setHistory(newHistory);
+    setUserInput("");
 
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userInput }),
+        body: JSON.stringify({ messages: newHistory }),
       });
 
       const data = await res.json();
-      if (data.text) {
-        setResponse(data.text);
-      } else {
-        setResponse("Eskize m, mwen pa ka reponn kounye a. Eseye ankò.");
-      }
+      const reply = data.text || "Eskize m, mwen pa ka reponn kounye a. Eseye ankò.";
+      setHistory([...newHistory, { role: "assistant", content: reply }]);
     } catch (error) {
-      setResponse("Gen yon ti pwoblèm teknik. Lapriyè pou nou!");
+      setHistory([...newHistory, { role: "assistant", content: "Gen yon ti pwoblèm teknik. Lapriyè pou nou!" }]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleConsultation();
     }
   };
 
@@ -45,61 +55,23 @@ export default function Home() {
     <div style={styles.container}>
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;600&display=swap');
-
-        html, body {
-          margin: 0;
-          padding: 0;
-          background: #fcfaf6;
-          font-family: 'Inter', sans-serif;
-          overflow-x: hidden;
-        }
-
-        * {
-          box-sizing: border-box;
-        }
-
-        textarea::placeholder {
-          color: #8f8a9f;
-        }
-
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes floatAura {
-          0% { transform: translate(0, 0) scale(1); }
-          50% { transform: translate(15px, -20px) scale(1.03); }
-          100% { transform: translate(0, 0) scale(1); }
-        }
-
-        .response-enter {
-          animation: fadeUp 0.8s ease-out forwards;
-        }
+        html, body { margin: 0; padding: 0; background: #fcfaf6; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        * { box-sizing: border-box; }
+        textarea::placeholder { color: #8f8a9f; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes floatAura { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(15px, -20px) scale(1.03); } 100% { transform: translate(0, 0) scale(1); } }
+        .msg-enter { animation: fadeUp 0.6s ease-out forwards; }
       `}</style>
 
-      {/* Decorative Auras */}
       <div style={styles.auraLeft} />
       <div style={styles.auraRight} />
       <div style={styles.auraCenter} />
 
       <main style={styles.content}>
         <div style={styles.badge}>SANKTYÈ • LAPÈ • SAJÈS</div>
-
-        <h1 style={styles.title}>
-          KONSEY <br />
-          <span style={styles.titleAccent}>ESPIRITYÈL</span>
-        </h1>
-
-        <p style={styles.subtitle}>
-          Yon espas prive kote ou ka pale san pè, san jijman.
-        </p>
-
-        <p style={styles.explainer}>
-          Ekri sa ki sou kè w — ou pral resevwa yon repons ki pote
-          sajès, lapè, ak direksyon pou ede w jwenn limyè nan moman difisil yo.
-        </p>
-
+        <h1 style={styles.title}>KONSEY <br /><span style={styles.titleAccent}>ESPIRITYÈL</span></h1>
+        <p style={styles.subtitle}>Yon espas prive kote ou ka pale san pè, san jijman.</p>
+        <p style={styles.explainer}>Ekri sa ki sou kè w — ou pral resevwa yon repons ki pote sajès, lapè, ak direksyon pou ede w jwenn limyè nan moman difisil yo.</p>
         <p style={styles.comfortLine}>Ou pa pou kont ou.</p>
 
         <div style={styles.card}>
@@ -108,6 +80,29 @@ export default function Home() {
             <span style={styles.helperText}>Sa rete ant ou menm ak Bondye.</span>
           </div>
 
+          {/* Conversation history */}
+          {history.length > 0 && (
+            <div style={styles.chatHistory}>
+              {history.map((msg, i) => (
+                <div key={i} className="msg-enter" style={msg.role === "user" ? styles.userBubble : styles.assistantBubble}>
+                  {msg.role === "assistant" && <div style={styles.responseHeader}>Yon pawòl pou ou</div>}
+                  <p style={msg.role === "user" ? styles.userText : styles.responseText}>{msg.content}</p>
+                </div>
+              ))}
+              {isLoading && (
+                <div style={styles.assistantBubble}>
+                  <div style={styles.responseHeader}>Yon pawòl pou ou</div>
+                  <p style={{ ...styles.responseText, opacity: 0.5, fontStyle: "italic" }}>M ap koute w...</p>
+                </div>
+              )}
+              <div ref={bottomRef} />
+            </div>
+          )}
+
+          {history.length === 0 && !isLoading && (
+            <div style={styles.placeholderBox}>Repons ou ap parèt isit la avèk dousè ak sajès.</div>
+          )}
+
           <textarea
             ref={textAreaRef}
             style={styles.textArea}
@@ -115,6 +110,7 @@ export default function Home() {
             rows="3"
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
 
           <button
@@ -131,19 +127,6 @@ export default function Home() {
           >
             {isLoading ? "M AP KOUTE..." : "CHÈCHE LAPÈ"}
           </button>
-
-          <div>
-            {response ? (
-              <div className="response-enter" style={styles.responseBox}>
-                <div style={styles.responseHeader}>Yon pawòl pou ou</div>
-                <p style={styles.responseText}>{response}</p>
-              </div>
-            ) : (
-              <div style={styles.placeholderBox}>
-                Repons ou ap parèt isit la avèk dousè ak sajès.
-              </div>
-            )}
-          </div>
         </div>
 
         <footer style={styles.footer}>LAFWA • LAPÈ • SAJÈS</footer>
@@ -153,202 +136,30 @@ export default function Home() {
 }
 
 const styles = {
-  container: {
-    minHeight: "100vh",
-    position: "relative",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: "40px 20px",
-  },
-  auraLeft: {
-    position: "absolute",
-    top: "5%",
-    left: "-10%",
-    width: "450px",
-    height: "450px",
-    background: "radial-gradient(circle, rgba(171,153,224,0.15), transparent 70%)",
-    filter: "blur(60px)",
-    animation: "floatAura 18s ease-in-out infinite",
-    pointerEvents: "none",
-  },
-  auraRight: {
-    position: "absolute",
-    bottom: "5%",
-    right: "-10%",
-    width: "450px",
-    height: "450px",
-    background: "radial-gradient(circle, rgba(212,189,125,0.12), transparent 70%)",
-    filter: "blur(60px)",
-    animation: "floatAura 22s ease-in-out infinite reverse",
-    pointerEvents: "none",
-  },
-  auraCenter: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "100%",
-    maxWidth: "800px",
-    height: "600px",
-    background: "radial-gradient(circle, rgba(255,255,255,0.8), transparent 65%)",
-    pointerEvents: "none",
-  },
-  content: {
-    position: "relative",
-    zIndex: 10,
-    maxWidth: "660px",
-    width: "100%",
-    textAlign: "center",
-    animation: "fadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1)",
-  },
-  badge: {
-    display: "inline-block",
-    padding: "8px 20px",
-    borderRadius: "100px",
-    background: "#fff",
-    border: "1px solid rgba(197,172,101,0.22)",
-    color: "#aa8b3f",
-    fontSize: "11px",
-    fontWeight: "700",
-    letterSpacing: "2.5px",
-    marginBottom: "24px",
-    boxShadow: "0 4px 15px rgba(0,0,0,0.02)",
-  },
-  title: {
-    fontFamily: "'Cormorant Garamond', serif",
-    fontSize: "clamp(50px, 8vw, 82px)",
-    lineHeight: "0.92",
-    color: "#2D264B",
-    marginBottom: "18px",
-    fontWeight: "700",
-  },
-  titleAccent: {
-    color: "#a99ae0",
-    fontStyle: "italic",
-    fontWeight: "600",
-  },
-  subtitle: {
-    fontSize: "20px",
-    color: "#2D264B",
-    marginBottom: "10px",
-    fontWeight: "600",
-  },
-  explainer: {
-    fontSize: "16px",
-    color: "#5e5873",
-    lineHeight: "1.7",
-    marginBottom: "20px",
-    maxWidth: "560px",
-    marginLeft: "auto",
-    marginRight: "auto",
-    fontWeight: "300",
-  },
-  comfortLine: {
-    color: "#8f7f5e",
-    fontSize: "16px",
-    fontWeight: "600",
-    fontStyle: "italic",
-    marginBottom: "35px",
-  },
-  card: {
-    background: "rgba(255,255,255,0.82)",
-    backdropFilter: "blur(20px)",
-    borderRadius: "32px",
-    padding: "32px",
-    border: "1px solid rgba(133,120,195,0.15)",
-    boxShadow: "0 25px 50px rgba(61,49,103,0.08)",
-    textAlign: "left",
-  },
-  labelRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "14px",
-    flexWrap: "wrap",
-    gap: "10px",
-  },
-  label: {
-    fontSize: "15px",
-    fontWeight: "600",
-    color: "#564f73",
-  },
-  helperText: {
-    fontSize: "12px",
-    color: "#aaa4bc",
-  },
-  textArea: {
-    width: "100%",
-    minHeight: "80px",
-    padding: "20px",
-    borderRadius: "20px",
-    border: "1px solid #ddd5ef",
-    background: "rgba(255,255,255,0.9)",
-    fontSize: "18px",
-    lineHeight: "1.6",
-    fontFamily: "inherit",
-    outline: "none",
-    resize: "none",
-    color: "#353246",
-    marginBottom: "24px",
-    transition: "border-color 0.3s ease, box-shadow 0.3s ease",
-    overflow: "hidden",
-  },
-  button: {
-    width: "100%",
-    padding: "18px",
-    borderRadius: "100px",
-    border: "none",
-    background: "linear-gradient(135deg, #b6acdf 0%, #9e92d6 100%)",
-    color: "#fff",
-    fontSize: "16px",
-    fontWeight: "700",
-    letterSpacing: "1.8px",
-    boxShadow: "0 10px 25px rgba(158,146,214,0.3)",
-    transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-    marginBottom: "28px",
-  },
-  buttonHover: {
-    transform: "translateY(-2px) scale(1.01)",
-    boxShadow: "0 15px 30px rgba(158,146,214,0.4)",
-  },
-  responseBox: {
-    background: "linear-gradient(to bottom, #ffffff, #f9f7ff)",
-    borderRadius: "22px",
-    padding: "26px",
-    border: "1px solid #eee9f8",
-    borderLeft: "5px solid #d4bd7d",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.02)",
-  },
-  responseHeader: {
-    fontSize: "12px",
-    fontWeight: "700",
-    color: "#b08f43",
-    letterSpacing: "1.5px",
-    textTransform: "uppercase",
-    marginBottom: "10px",
-  },
-  responseText: {
-    fontSize: "17.5px",
-    lineHeight: "1.8",
-    color: "#3f385e",
-    margin: 0,
-  },
-  placeholderBox: {
-    padding: "22px",
-    textAlign: "center",
-    color: "#b0aac2",
-    fontSize: "15px",
-    fontStyle: "italic",
-    border: "1px dashed #dcd6f0",
-    borderRadius: "20px",
-  },
-  footer: {
-    marginTop: "45px",
-    fontSize: "12px",
-    letterSpacing: "6px",
-    color: "#9b9169",
-    fontWeight: "600",
-    opacity: 0.8,
-  },
+  container: { minHeight: "100vh", position: "relative", display: "flex", justifyContent: "center", alignItems: "center", padding: "40px 20px" },
+  auraLeft: { position: "absolute", top: "5%", left: "-10%", width: "450px", height: "450px", background: "radial-gradient(circle, rgba(171,153,224,0.15), transparent 70%)", filter: "blur(60px)", animation: "floatAura 18s ease-in-out infinite", pointerEvents: "none" },
+  auraRight: { position: "absolute", bottom: "5%", right: "-10%", width: "450px", height: "450px", background: "radial-gradient(circle, rgba(212,189,125,0.12), transparent 70%)", filter: "blur(60px)", animation: "floatAura 22s ease-in-out infinite reverse", pointerEvents: "none" },
+  auraCenter: { position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "100%", maxWidth: "800px", height: "600px", background: "radial-gradient(circle, rgba(255,255,255,0.8), transparent 65%)", pointerEvents: "none" },
+  content: { position: "relative", zIndex: 10, maxWidth: "660px", width: "100%", textAlign: "center", animation: "fadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1)" },
+  badge: { display: "inline-block", padding: "8px 20px", borderRadius: "100px", background: "#fff", border: "1px solid rgba(197,172,101,0.22)", color: "#aa8b3f", fontSize: "11px", fontWeight: "700", letterSpacing: "2.5px", marginBottom: "24px", boxShadow: "0 4px 15px rgba(0,0,0,0.02)" },
+  title: { fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(50px, 8vw, 82px)", lineHeight: "0.92", color: "#2D264B", marginBottom: "18px", fontWeight: "700" },
+  titleAccent: { color: "#a99ae0", fontStyle: "italic", fontWeight: "600" },
+  subtitle: { fontSize: "20px", color: "#2D264B", marginBottom: "10px", fontWeight: "600" },
+  explainer: { fontSize: "16px", color: "#5e5873", lineHeight: "1.7", marginBottom: "20px", maxWidth: "560px", marginLeft: "auto", marginRight: "auto", fontWeight: "300" },
+  comfortLine: { color: "#8f7f5e", fontSize: "16px", fontWeight: "600", fontStyle: "italic", marginBottom: "35px" },
+  card: { background: "rgba(255,255,255,0.82)", backdropFilter: "blur(20px)", borderRadius: "32px", padding: "32px", border: "1px solid rgba(133,120,195,0.15)", boxShadow: "0 25px 50px rgba(61,49,103,0.08)", textAlign: "left" },
+  labelRow: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px", flexWrap: "wrap", gap: "10px" },
+  label: { fontSize: "15px", fontWeight: "600", color: "#564f73" },
+  helperText: { fontSize: "12px", color: "#aaa4bc" },
+  chatHistory: { marginBottom: "24px", display: "flex", flexDirection: "column", gap: "16px", maxHeight: "400px", overflowY: "auto", paddingRight: "4px" },
+  userBubble: { alignSelf: "flex-end", background: "linear-gradient(135deg, #b6acdf 0%, #9e92d6 100%)", borderRadius: "20px 20px 4px 20px", padding: "14px 18px", maxWidth: "85%" },
+  assistantBubble: { background: "linear-gradient(to bottom, #ffffff, #f9f7ff)", borderRadius: "20px 20px 20px 4px", padding: "20px 22px", border: "1px solid #eee9f8", borderLeft: "4px solid #d4bd7d", maxWidth: "95%" },
+  userText: { fontSize: "16px", lineHeight: "1.6", color: "#fff", margin: 0 },
+  responseHeader: { fontSize: "11px", fontWeight: "700", color: "#b08f43", letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" },
+  responseText: { fontSize: "17px", lineHeight: "1.8", color: "#3f385e", margin: 0 },
+  placeholderBox: { padding: "22px", textAlign: "center", color: "#b0aac2", fontSize: "15px", fontStyle: "italic", border: "1px dashed #dcd6f0", borderRadius: "20px", marginBottom: "24px" },
+  textArea: { width: "100%", minHeight: "80px", padding: "20px", borderRadius: "20px", border: "1px solid #ddd5ef", background: "rgba(255,255,255,0.9)", fontSize: "18px", lineHeight: "1.6", fontFamily: "inherit", outline: "none", resize: "none", color: "#353246", marginBottom: "24px", transition: "border-color 0.3s ease, box-shadow 0.3s ease", overflow: "hidden" },
+  button: { width: "100%", padding: "18px", borderRadius: "100px", border: "none", background: "linear-gradient(135deg, #b6acdf 0%, #9e92d6 100%)", color: "#fff", fontSize: "16px", fontWeight: "700", letterSpacing: "1.8px", boxShadow: "0 10px 25px rgba(158,146,214,0.3)", transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)", marginBottom: "0" },
+  buttonHover: { transform: "translateY(-2px) scale(1.01)", boxShadow: "0 15px 30px rgba(158,146,214,0.4)" },
+  footer: { marginTop: "45px", fontSize: "12px", letterSpacing: "6px", color: "#9b9169", fontWeight: "600", opacity: 0.8 },
 };
