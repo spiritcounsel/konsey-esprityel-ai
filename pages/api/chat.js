@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   try {
     // We are using 'gemini-1.5-flash-latest' which is the 
     // global stable name that avoids the 404 error.
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     const userPrompt = body.message || "Bonjou";
