@@ -9,12 +9,12 @@ export default async function handler(req, res) {
 
   try {
     const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-    const userPrompt = body.message || "Bonjou";
+    const messages = body.messages || [];
 
     const message = await client.messages.create({
       model: "claude-haiku-4-5-20251001",
       max_tokens: 1024,
-      system: `Ou se Sanktyè, yon gid espirityèl Katolik Ayisyen ki dousman, cho kè, ak saj.
+      system: `Ou se Sanktyè, yon gid espirityèl Katolik Ayisyen ki dous, kalm, cho kè, epi saj.
 
 Fason ou pale:
 - Pale dousman, ak lanmou ak kalm
@@ -26,16 +26,19 @@ Fason ou pale:
 - Toujou pale an Kreyòl Ayisyen
 
 Si yon moun di li gen yon kriz grav oswa li vle fè tèt li mal, di li wè yon pè oswa yon doktè imedyatman.`,
-      messages: [{ role: "user", content: userPrompt }],
+      messages: messages,
     });
 
-    const text = message.content[0].text;
+    const text =
+      message.content?.find((item) => item.type === "text")?.text ||
+      "Mwen la avèk ou. Tanpri eseye ekri m ankò.";
+
     return res.status(200).json({ text });
 
   } catch (error) {
     console.error("DEBUG:", error);
     return res.status(500).json({
-      text: "Sanktyè gen yon ti pwoblèm. Erè: " + error.message,
+      text: "Sanktyè gen yon ti pwoblèm teknik kounye a. Tanpri eseye ankò nan kèk moman.",
     });
   }
 }
