@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
+import { useUser, SignInButton, SignOutButton } from "@clerk/nextjs";
 
 export default function Home() {
+  const { isSignedIn, user } = useUser();
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -67,6 +69,22 @@ export default function Home() {
       <div style={styles.auraRight} />
       <div style={styles.auraCenter} />
 
+      {/* Auth button top right */}
+      <div style={styles.authBar}>
+        {isSignedIn ? (
+          <div style={styles.authRow}>
+            <span style={styles.authName}>👤 {user.firstName || user.emailAddresses[0].emailAddress}</span>
+            <SignOutButton>
+              <button style={styles.authButton}>Sign out</button>
+            </SignOutButton>
+          </div>
+        ) : (
+          <SignInButton mode="modal">
+            <button style={styles.authButton}>Sign in</button>
+          </SignInButton>
+        )}
+      </div>
+
       <main style={styles.content}>
         <div style={styles.badge}>SANKTYÈ • LAPÈ • SAJÈS</div>
         <h1 style={styles.title}>KONSEY <br /><span style={styles.titleAccent}>ESPIRITYÈL</span></h1>
@@ -80,7 +98,6 @@ export default function Home() {
             <span style={styles.helperText}>Sa rete ant ou menm ak Bondye.</span>
           </div>
 
-          {/* Conversation history */}
           {history.length > 0 && (
             <div style={styles.chatHistory}>
               {history.map((msg, i) => (
@@ -137,6 +154,10 @@ export default function Home() {
 
 const styles = {
   container: { minHeight: "100vh", position: "relative", display: "flex", justifyContent: "center", alignItems: "center", padding: "40px 20px" },
+  authBar: { position: "absolute", top: "20px", right: "24px", zIndex: 20 },
+  authRow: { display: "flex", alignItems: "center", gap: "12px" },
+  authName: { fontSize: "13px", color: "#5e5873" },
+  authButton: { padding: "8px 18px", borderRadius: "100px", border: "1px solid rgba(133,120,195,0.4)", background: "rgba(255,255,255,0.9)", color: "#564f73", fontSize: "13px", fontWeight: "600", cursor: "pointer" },
   auraLeft: { position: "absolute", top: "5%", left: "-10%", width: "450px", height: "450px", background: "radial-gradient(circle, rgba(171,153,224,0.15), transparent 70%)", filter: "blur(60px)", animation: "floatAura 18s ease-in-out infinite", pointerEvents: "none" },
   auraRight: { position: "absolute", bottom: "5%", right: "-10%", width: "450px", height: "450px", background: "radial-gradient(circle, rgba(212,189,125,0.12), transparent 70%)", filter: "blur(60px)", animation: "floatAura 22s ease-in-out infinite reverse", pointerEvents: "none" },
   auraCenter: { position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "100%", maxWidth: "800px", height: "600px", background: "radial-gradient(circle, rgba(255,255,255,0.8), transparent 65%)", pointerEvents: "none" },
