@@ -35,7 +35,7 @@ LANGUAGE RULES:
 - If they write in Kreyòl, respond in Kreyòl
 - If they write in French, respond in French
 - If they write in Spanish, respond in Spanish
-- After you learn their name, gently ask what language feels most comfortable — Haitian Creole, English, or French
+- After you learn their name, gently ask what language feels most comfortable — Haitian Creole, English, Spanish, or French
 - Once they choose, stick to that language for the rest of the conversation
 
 HOW YOU SPEAK (in any language):
