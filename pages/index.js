@@ -6,7 +6,10 @@ export default function Home() {
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isUpgradeHovered, setIsUpgradeHovered] = useState(false);
   const [history, setHistory] = useState([]);
+  const [isPaid, setIsPaid] = useState(false);
+  const [checkingPlan, setCheckingPlan] = useState(false);
   const textAreaRef = useRef(null);
   const bottomRef = useRef(null);
 
@@ -21,10 +24,47 @@ export default function Home() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [history]);
 
+  // Check URL for success/canceled from Stripe
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("success")) {
+      setIsPaid(true);
+      window.history.replaceState({}, "", "/");
+    }
+  }, []);
+
+  const handleUpgrade = async () => {
+    if (!isSignedIn) return;
+    setCheckingPlan(true);
+    try {
+      const res = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error("Upgrade error:", error);
+    } finally {
+      setCheckingPlan(false);
+    }
+  };
+
   const handleConsultation = async () => {
     if (!userInput.trim()) return;
-    setIsLoading(true);
 
+    // Free tier limit
+    if (!isPaid && history.filter(m => m.role === "user").length >= 5) {
+      setHistory([...history, {
+        role: "assistant",
+        content: "You've reached the free limit of 5 messages. Upgrade to Lafwa ($7/month) for unlimited conversations. 🙏"
+      }]);
+      return;
+    }
+
+    setIsLoading(true);
     const newHistory = [...history, { role: "user", content: userInput }];
     setHistory(newHistory);
     setUserInput("");
@@ -35,7 +75,6 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: newHistory }),
       });
-
       const data = await res.json();
       const reply = data.text || "Eskize m, mwen pa ka reponn kounye a. Eseye ankò.";
       setHistory([...newHistory, { role: "assistant", content: reply }]);
@@ -69,10 +108,22 @@ export default function Home() {
       <div style={styles.auraRight} />
       <div style={styles.auraCenter} />
 
-      {/* Auth button top right */}
+      {/* Auth bar */}
       <div style={styles.authBar}>
         {isSignedIn ? (
           <div style={styles.authRow}>
+            {!isPaid && (
+              <button
+                style={{ ...styles.upgradeButton, ...(isUpgradeHovered ? styles.upgradeButtonHover : {}) }}
+                onMouseEnter={() => setIsUpgradeHovered(true)}
+                onMouseLeave={() => setIsUpgradeHovered(false)}
+                onClick={handleUpgrade}
+                disabled={checkingPlan}
+              >
+                {checkingPlan ? "Loading..." : "✨ Upgrade to Lafwa — $7/mo"}
+              </button>
+            )}
+            {isPaid && <span style={styles.paidBadge}>✨ Lafwa Member</span>}
             <span style={styles.authName}>👤 {user.firstName || user.emailAddresses[0].emailAddress}</span>
             <SignOutButton>
               <button style={styles.authButton}>Sign out</button>
@@ -155,9 +206,12 @@ export default function Home() {
 const styles = {
   container: { minHeight: "100vh", position: "relative", display: "flex", justifyContent: "center", alignItems: "center", padding: "40px 20px" },
   authBar: { position: "absolute", top: "20px", right: "24px", zIndex: 20 },
-  authRow: { display: "flex", alignItems: "center", gap: "12px" },
+  authRow: { display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", justifyContent: "flex-end" },
   authName: { fontSize: "13px", color: "#5e5873" },
   authButton: { padding: "8px 18px", borderRadius: "100px", border: "1px solid rgba(133,120,195,0.4)", background: "rgba(255,255,255,0.9)", color: "#564f73", fontSize: "13px", fontWeight: "600", cursor: "pointer" },
+  upgradeButton: { padding: "8px 18px", borderRadius: "100px", border: "none", background: "linear-gradient(135deg, #d4bd7d, #b08f43)", color: "#fff", fontSize: "13px", fontWeight: "600", cursor: "pointer", transition: "all 0.3s ease", boxShadow: "0 4px 12px rgba(176,143,67,0.3)" },
+  upgradeButtonHover: { transform: "translateY(-1px)", boxShadow: "0 6px 16px rgba(176,143,67,0.4)" },
+  paidBadge: { padding: "6px 14px", borderRadius: "100px", background: "linear-gradient(135deg, #d4bd7d, #b08f43)", color: "#fff", fontSize: "12px", fontWeight: "700" },
   auraLeft: { position: "absolute", top: "5%", left: "-10%", width: "450px", height: "450px", background: "radial-gradient(circle, rgba(171,153,224,0.15), transparent 70%)", filter: "blur(60px)", animation: "floatAura 18s ease-in-out infinite", pointerEvents: "none" },
   auraRight: { position: "absolute", bottom: "5%", right: "-10%", width: "450px", height: "450px", background: "radial-gradient(circle, rgba(212,189,125,0.12), transparent 70%)", filter: "blur(60px)", animation: "floatAura 22s ease-in-out infinite reverse", pointerEvents: "none" },
   auraCenter: { position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "100%", maxWidth: "800px", height: "600px", background: "radial-gradient(circle, rgba(255,255,255,0.8), transparent 65%)", pointerEvents: "none" },
