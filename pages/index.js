@@ -167,7 +167,7 @@ export default function Home() {
     if (!userInput.trim()) return;
     const t = translations[lang];
 
-    if (!isPaid && history.filter(m => m.role === "user").length >= 5) {
+    if (!isPaid && history.filter(m => m.role === "user").length >= 15) {
       setHistory([...history, { role: "assistant", content: t.freeLimit }]);
       return;
     }
